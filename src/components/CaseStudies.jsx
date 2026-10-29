@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { caseStudies } from "../data/content";
 import MediaLightbox from "./MediaLightbox";
 import { Reveal, StaggerGroup, StaggerItem } from "./Reveal";
+
+const AUTO_FLIP_BACK_MS = 5 * 1000;
 
 const TINTS = [
   { soft: "var(--pill-mint)", bold: "var(--accent-mint)" },
@@ -19,6 +21,7 @@ function FlipCard({ study, index }) {
   const [flipped, setFlipped] = useState(false);
   const [mediaIndex, setMediaIndex] = useState(null);
   const tint = TINTS[index % TINTS.length];
+  const autoFlipTimer = useRef(null);
 
   // Video first, then images — one combined, orderable set so the lightbox
   // can slide left/right across every item regardless of type.
@@ -26,6 +29,26 @@ function FlipCard({ study, index }) {
     ...(study.video ? [{ type: "video", src: study.video }] : []),
     ...study.images.map((src) => ({ type: "image", src })),
   ];
+
+  // Flipping the card open starts a 5-second "no activity" clock that flips
+  // it back automatically; opening an image/video or sliding through the
+  // lightbox counts as activity and restarts the clock.
+  function bumpAutoFlipTimer() {
+    if (autoFlipTimer.current) clearTimeout(autoFlipTimer.current);
+    autoFlipTimer.current = setTimeout(() => setFlipped(false), AUTO_FLIP_BACK_MS);
+  }
+
+  useEffect(() => {
+    if (flipped) {
+      bumpAutoFlipTimer();
+    } else if (autoFlipTimer.current) {
+      clearTimeout(autoFlipTimer.current);
+    }
+    return () => {
+      if (autoFlipTimer.current) clearTimeout(autoFlipTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [flipped]);
 
   return (
     <StaggerItem>
@@ -87,6 +110,7 @@ function FlipCard({ study, index }) {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
+                        bumpAutoFlipTimer();
                         setMediaIndex(mi);
                       }}
                       className="group relative rounded-lg overflow-hidden cursor-pointer"
@@ -145,7 +169,10 @@ function FlipCard({ study, index }) {
             index={mediaIndex}
             alt={study.title}
             onClose={() => setMediaIndex(null)}
-            onIndexChange={setMediaIndex}
+            onIndexChange={(i) => {
+              bumpAutoFlipTimer();
+              setMediaIndex(i);
+            }}
           />
         )}
       </AnimatePresence>

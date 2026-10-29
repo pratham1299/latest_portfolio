@@ -10,6 +10,21 @@ import ContactModal from "./ContactModal";
 // have real documents — an empty dropdown entry would look broken.
 const worksKeys = Object.keys(works).filter((key) => works[key].subcategories.length > 0);
 
+const RESUME_URL = "/Priyanshi-Gupta-Resume.pdf";
+const RESUME_FILENAME = "Priyanshi-Gupta-Resume.pdf";
+
+// Resume link opens the PDF in a new tab (default anchor behavior) *and*
+// silently triggers a save via a second, download-flagged anchor — so a
+// single click both previews and downloads it.
+function triggerResumeDownload() {
+  const link = document.createElement("a");
+  link.href = RESUME_URL;
+  link.download = RESUME_FILENAME;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 const linkListVariants = {
   hidden: {},
   show: { transition: { staggerChildren: 0.035 } },
@@ -249,11 +264,14 @@ export default function Navbar() {
               Experience
             </Link>
             <a
-              href="/#contact"
+              href={RESUME_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={triggerResumeDownload}
               className="pill px-5 py-2 text-sm font-medium hover:opacity-70 transition-opacity"
               style={{ background: "var(--pill-mint)" }}
             >
-              Contact
+              Resume
             </a>
           </div>
 
@@ -391,12 +409,17 @@ export default function Navbar() {
                 Experience
               </Link>
               <a
-                href="/#contact"
-                onClick={() => setMobileOpen(false)}
+                href={RESUME_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  triggerResumeDownload();
+                  setMobileOpen(false);
+                }}
                 className="pill w-full px-5 py-3 text-sm font-medium text-center"
                 style={{ background: "var(--pill-mint)" }}
               >
-                Contact
+                Resume
               </a>
               <button
                 onClick={() => {

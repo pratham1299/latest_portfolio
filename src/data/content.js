@@ -143,7 +143,12 @@ export const caseStudies = [
   {
     title: "Office Inauguration Event",
     gist: "Coordinated the flagship office launch end-to-end — vendors, signage, and on-ground flow.",
-    images: [],
+    images: [
+      "/case-studies/office-2.jpg",
+      "/case-studies/office-3.jpg",
+      "/case-studies/office-1.jpg",
+      "/case-studies/office-4.jpg",
+    ],
   },
   {
     title: "Quirks Event Collaterals",
