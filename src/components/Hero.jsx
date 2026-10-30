@@ -1,19 +1,34 @@
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { hero, profile } from "../data/content";
 import MagneticButton from "./MagneticButton";
+import HeroButterflyDisperse from "./HeroButterflyDisperse";
 
 export default function Hero() {
+  const { scrollY } = useScroll();
+  // Silky smooth dissolve as scroll begins, seamlessly breaking into the flock of butterflies
+  const imgOpacity = useTransform(scrollY, [0, 280], [1, 0]);
+  const imgScale = useTransform(scrollY, [0, 280], [1, 1.05]);
+  const imgBlur = useTransform(scrollY, [0, 280], ["blur(0px)", "blur(6px)"]);
+
   return (
     <section id="home" className="relative min-h-screen flex items-center overflow-hidden">
-      <motion.img
-        src="/hero-bg.png"
-        alt={`${profile.name} portrait`}
-        initial={{ opacity: 0, scale: 1.05, filter: "blur(10px)" }}
-        animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-        transition={{ duration: 1.3, ease: [0.22, 1, 0.36, 1] }}
-        className="absolute inset-0 w-full h-full object-cover select-none"
-        style={{ objectPosition: "85% 15%", filter: "saturate(0.95) contrast(1.02)" }}
-      />
+      <motion.div
+        className="absolute inset-0 w-full h-full select-none pointer-events-none"
+        style={{ opacity: imgOpacity, scale: imgScale, filter: imgBlur }}
+      >
+        <motion.img
+          src="/hero-bg.png"
+          alt={`${profile.name} portrait`}
+          initial={{ opacity: 0, scale: 1.05, filter: "blur(10px)" }}
+          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+          transition={{ duration: 1.3, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full h-full object-cover"
+          style={{ objectPosition: "85% 15%", filter: "saturate(0.95) contrast(1.02)" }}
+        />
+      </motion.div>
+
+      {/* 3D Swarm of butterflies that breaks away from the portrait on scroll */}
+      <HeroButterflyDisperse />
 
       <div
         className="absolute inset-0 pointer-events-none"
