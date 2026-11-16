@@ -15,15 +15,15 @@ function createWingTexture(baseColorHex, accentColorHex) {
   // Radiant gradient from wing root outward
   const grad = ctx.createRadialGradient(140, 460, 20, 260, 260, 320);
   grad.addColorStop(0, accentColorHex);
-  grad.addColorStop(0.5, baseColorHex);
-  grad.addColorStop(0.85, "rgba(42, 22, 14, 0.92)");
-  grad.addColorStop(1, "rgba(20, 10, 6, 0.98)");
+  grad.addColorStop(0.4, baseColorHex);
+  grad.addColorStop(0.78, "rgba(42, 22, 14, 0.94)");
+  grad.addColorStop(1, "rgba(18, 9, 5, 0.98)");
 
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, 512, 512);
 
   // Delicate wing veins
-  ctx.strokeStyle = "rgba(25, 12, 8, 0.7)";
+  ctx.strokeStyle = "rgba(25, 12, 8, 0.75)";
   ctx.lineWidth = 4;
   ctx.lineCap = "round";
 
@@ -48,7 +48,7 @@ function createWingTexture(baseColorHex, accentColorHex) {
     ctx.stroke();
   });
 
-  // Delicate white margin dots along wing border
+  // Delicate white/pearl margin dots along wing border
   ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
   const marginDots = [
     [200, 65],
@@ -84,9 +84,9 @@ function createSparkleTexture() {
   const ctx = canvas.getContext("2d");
 
   const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-  grad.addColorStop(0, "rgba(255, 248, 220, 1)");
-  grad.addColorStop(0.25, "rgba(240, 200, 110, 0.85)");
-  grad.addColorStop(0.6, "rgba(210, 130, 65, 0.35)");
+  grad.addColorStop(0, "rgba(255, 250, 230, 1)");
+  grad.addColorStop(0.25, "rgba(245, 210, 120, 0.9)");
+  grad.addColorStop(0.6, "rgba(215, 140, 70, 0.4)");
   grad.addColorStop(1, "rgba(180, 90, 40, 0)");
 
   ctx.fillStyle = grad;
@@ -123,16 +123,28 @@ export default function HeroButterflyDisperse() {
     container.appendChild(renderer.domElement);
 
     // --- LIGHTS ---
-    const ambientLight = new THREE.AmbientLight(0xfff7ee, 1.6);
+    const ambientLight = new THREE.AmbientLight(0xfff7ee, 1.8);
     scene.add(ambientLight);
 
-    const sunLight = new THREE.DirectionalLight(0xfff0d8, 1.9);
-    sunLight.position.set(3, 5, 4);
+    const sunLight = new THREE.DirectionalLight(0xffeed6, 2.2);
+    sunLight.position.set(4, 5, 4);
     scene.add(sunLight);
 
-    const rimLight = new THREE.DirectionalLight(0xcde8ff, 0.9);
+    const rimLight = new THREE.DirectionalLight(0xcde8ff, 1.1);
     rimLight.position.set(-4, -2, 2);
     scene.add(rimLight);
+
+    // Helper to compute chest/silhouette anchor in 3D world space from camera aspect
+    const getChestAnchor = () => {
+      const halfW = 6.0 * Math.tan((45 * Math.PI) / 360) * camera.aspect;
+      // Portrait silhouette center at 74% horizontal width across screen
+      return {
+        x: -halfW + 0.74 * (2 * halfW),
+        y: 0.32,
+      };
+    };
+
+    let chestAnchor = getChestAnchor();
 
     // --- WING SHAPES ---
     // Upper forewing
@@ -161,7 +173,7 @@ export default function HeroButterflyDisperse() {
       { base: "#6e4228", accent: "#ffd9aa" }, // Warm hazel
     ];
 
-    const materials = colorThemes.map(({ base, accent }) => {
+    const swarmMaterials = colorThemes.map(({ base, accent }) => {
       const tex = createWingTexture(base, accent);
       return new THREE.MeshStandardMaterial({
         map: tex,
@@ -185,51 +197,41 @@ export default function HeroButterflyDisperse() {
     const thoraxGeo = new THREE.CylinderGeometry(0.025, 0.02, 0.25, 8);
     const headGeo = new THREE.SphereGeometry(0.035, 8, 8);
 
-    // --- BUTTERFLY FLOCK CREATION ---
-    const BUTTERFLY_COUNT = 80;
+    // ==========================================
+    // BUTTERFLY SWARM BREAKING FROM PORTRAIT
+    // Starts 100% invisible / clean at rest (scrollY = 0).
+    // ONLY as the user scrolls, butterflies emerge from her silhouette and take flight!
+    // ==========================================
+    const SWARM_COUNT = 80;
     const butterflies = [];
 
-    // Center anchor of the portrait
-    const centerX = 1.45;
-    const centerY = 0.0;
-
-    for (let i = 0; i < BUTTERFLY_COUNT; i++) {
-      const mat = materials[i % materials.length];
-
+    for (let i = 0; i < SWARM_COUNT; i++) {
+      const mat = swarmMaterials[i % swarmMaterials.length];
       const group = new THREE.Group();
 
-      // Left wing pivot
       const leftPivot = new THREE.Group();
       leftPivot.position.set(-0.025, 0, 0);
-
       const leftFore = new THREE.Mesh(forewingGeo, mat);
       leftFore.scale.set(-1, 1, 1);
       leftFore.rotation.z = 0.12;
       leftPivot.add(leftFore);
-
       const leftHind = new THREE.Mesh(hindwingGeo, mat);
       leftHind.scale.set(-0.85, 0.85, 1);
       leftHind.rotation.z = -0.1;
       leftPivot.add(leftHind);
-
       group.add(leftPivot);
 
-      // Right wing pivot
       const rightPivot = new THREE.Group();
       rightPivot.position.set(0.025, 0, 0);
-
       const rightFore = new THREE.Mesh(forewingGeo, mat);
       rightFore.rotation.z = -0.12;
       rightPivot.add(rightFore);
-
       const rightHind = new THREE.Mesh(hindwingGeo, mat);
       rightHind.scale.set(0.85, 0.85, 1);
       rightHind.rotation.z = 0.1;
       rightPivot.add(rightHind);
-
       group.add(rightPivot);
 
-      // Body
       const thorax = new THREE.Mesh(thoraxGeo, bodyMat);
       thorax.rotation.x = Math.PI / 2;
       group.add(thorax);
@@ -238,52 +240,49 @@ export default function HeroButterflyDisperse() {
       head.position.set(0, 0.14, 0);
       group.add(head);
 
-      // Delicate scale variation
-      const baseScale = 0.16 + Math.random() * 0.12;
-      group.scale.set(baseScale, baseScale, baseScale);
-
+      // Start completely at scale 0 (invisible at rest)
+      group.scale.set(0, 0, 0);
       scene.add(group);
 
-      // Distribute home position across portrait silhouette
-      let homeX, homeY, homeZ;
+      // Distribute offsets across her silhouette (hair, shoulders, blazer, torso)
+      let ox, oy, oz;
       const r = Math.random();
       if (r < 0.28) {
-        // Head & hair
-        homeX = 1.35 + (Math.random() - 0.5) * 0.8;
-        homeY = 0.78 + (Math.random() - 0.5) * 0.65;
-        homeZ = (Math.random() - 0.5) * 0.25;
+        // Head & hair area
+        ox = (Math.random() - 0.5) * 0.75;
+        oy = 0.82 + (Math.random() - 0.5) * 0.55;
+        oz = (Math.random() - 0.5) * 0.2;
       } else if (r < 0.65) {
         // Shoulders & upper blazer
-        homeX = 1.45 + (Math.random() - 0.5) * 1.35;
-        homeY = 0.15 + (Math.random() - 0.5) * 0.55;
-        homeZ = (Math.random() - 0.5) * 0.35;
+        ox = (Math.random() - 0.5) * 1.25;
+        oy = (Math.random() - 0.5) * 0.5;
+        oz = (Math.random() - 0.5) * 0.25;
       } else {
-        // Torso & lower jacket
-        homeX = 1.4 + (Math.random() - 0.5) * 1.5;
-        homeY = -0.68 + (Math.random() - 0.5) * 0.9;
-        homeZ = (Math.random() - 0.5) * 0.4;
+        // Lower jacket & torso
+        ox = (Math.random() - 0.5) * 1.4;
+        oy = -0.68 + (Math.random() - 0.5) * 0.75;
+        oz = (Math.random() - 0.5) * 0.3;
       }
 
-      // Organic peeling wave: distance from center determines stagger timing
-      const distFromCenter = Math.hypot(homeX - centerX, homeY - centerY);
-      // Outer butterflies lift off first, core follows smoothly
-      const stagger = Math.max(0, Math.min(0.28 - distFromCenter * 0.15, 0.25));
+      // Distance from chest epicenter sets the peel-away cascade timing
+      const distFromChest = Math.hypot(ox, oy);
+      const stagger = Math.max(0, Math.min(distFromChest * 0.18, 0.32));
 
       // Flight trajectory: outward spread + upward lift + camera depth
-      const angle = Math.atan2(homeY - centerY, homeX - centerX) + (Math.random() - 0.5) * 0.7;
-      const speed = 2.0 + Math.random() * 3.2;
-      const lift = 1.4 + Math.random() * 2.6;
+      const angle = Math.atan2(oy, ox) + (Math.random() - 0.5) * 0.6;
+      const speed = 2.4 + Math.random() * 3.4;
+      const lift = 1.2 + Math.random() * 2.8;
 
       const scatterDir = new THREE.Vector3(
-        Math.cos(angle) * speed + (Math.random() - 0.5) * 1.2,
-        Math.sin(angle) * 0.55 + lift,
-        0.8 + Math.random() * 2.2
+        Math.cos(angle) * speed - 0.3,
+        Math.sin(angle) * 0.5 + lift,
+        1.2 + Math.random() * 2.8
       );
 
-      // Smooth vortex turbulence
-      const swirlSpeed = 1.8 + Math.random() * 2.4;
-      const swirlRadius = 0.3 + Math.random() * 0.5;
+      const swirlSpeed = 1.8 + Math.random() * 2.5;
+      const swirlRadius = 0.3 + Math.random() * 0.55;
       const swirlPhase = Math.random() * Math.PI * 2;
+      const baseScale = 0.15 + Math.random() * 0.13;
 
       butterflies.push({
         group,
@@ -291,27 +290,29 @@ export default function HeroButterflyDisperse() {
         rightPivot,
         leftHind,
         rightHind,
-        homePos: new THREE.Vector3(homeX, homeY, homeZ),
+        offset: new THREE.Vector3(ox, oy, oz),
+        homePos: new THREE.Vector3(),
         scatterDir,
         swirlSpeed,
         swirlRadius,
         swirlPhase,
         stagger,
         baseScale,
-        flapSpeed: 16 + Math.random() * 10,
+        flapSpeed: 16 + Math.random() * 12,
         flapPhase: Math.random() * Math.PI * 2,
         flapAmp: 0.75 + Math.random() * 0.25,
-        currentPos: new THREE.Vector3(homeX, homeY, homeZ),
+        currentPos: new THREE.Vector3(),
         rotX: 0,
         rotY: 0,
         rotZ: 0,
       });
-
-      group.position.set(homeX, homeY, homeZ);
     }
 
-    // --- GOLDEN FAIRY DUST PARTICLES ---
-    const SPARKLE_COUNT = 100;
+    // ==========================================
+    // GOLDEN FAIRY DUST PARTICLES
+    // Emitted ONLY during scroll flight
+    // ==========================================
+    const SPARKLE_COUNT = 140;
     const sparkleGeo = new THREE.BufferGeometry();
     const sparklePositions = new Float32Array(SPARKLE_COUNT * 3);
     const sparkleLifes = new Float32Array(SPARKLE_COUNT);
@@ -325,17 +326,14 @@ export default function HeroButterflyDisperse() {
       sparkleVelocities.push(new THREE.Vector3());
     }
 
-    sparkleGeo.setAttribute(
-      "position",
-      new THREE.BufferAttribute(sparklePositions, 3)
-    );
+    sparkleGeo.setAttribute("position", new THREE.BufferAttribute(sparklePositions, 3));
 
     const sparkleTexture = createSparkleTexture();
     const sparkleMat = new THREE.PointsMaterial({
-      size: 0.16,
+      size: 0.18,
       map: sparkleTexture,
       transparent: true,
-      opacity: 0.8,
+      opacity: 0.0, // starts completely hidden at rest
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       color: 0xffd57a,
@@ -344,109 +342,138 @@ export default function HeroButterflyDisperse() {
     const sparklePoints = new THREE.Points(sparkleGeo, sparkleMat);
     scene.add(sparklePoints);
 
-    // --- BUTTERY SMOOTH SCROLL TRACKING ---
+    // ==========================================
+    // SCROLL TRACKING
+    // ==========================================
     let scrollProgress = 0;
     let targetProgress = 0;
 
     const handleScroll = () => {
       const heroHeight = container.clientHeight || window.innerHeight;
       const sy = window.scrollY;
-      // Normalizes scroll across the hero transition zone with gentle buffer
       targetProgress = Math.min(Math.max(sy / (heroHeight * 0.75), 0), 1);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
 
-    // --- ANIMATION LOOP ---
+    // ==========================================
+    // ANIMATION LOOP
+    // ==========================================
     let animationFrameId;
-    let clock = new THREE.Clock();
+    const clock = new THREE.Clock();
     let sparkleCursor = 0;
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
 
+      // Sleep when hero is far off-screen to preserve 60-120fps scroll performance
+      const heroThreshold = (container.clientHeight || window.innerHeight) * 1.4;
+      if (window.scrollY > heroThreshold) {
+        return;
+      }
+
       const delta = Math.min(clock.getDelta(), 0.1);
       const time = clock.getElapsedTime();
 
-      // Exponential smooth damping (butter-smooth across all refresh rates)
+      // Exponential smooth damping
       const damp = 1.0 - Math.pow(0.001, delta);
       scrollProgress += (targetProgress - scrollProgress) * damp;
 
-      // Master opacity: butterflies seamlessly appear as scroll starts
-      const masterOpacity = Math.min(scrollProgress / 0.12, 1.0);
+      chestAnchor = getChestAnchor();
 
-      materials.forEach((m) => {
-        m.opacity = masterOpacity * 0.94;
+      // At rest (scrollProgress near 0), KEEP EVERYTHING INVISIBLE (clean portrait)
+      if (scrollProgress < 0.008) {
+        swarmMaterials.forEach((m) => {
+          m.opacity = 0;
+        });
+        bodyMat.opacity = 0;
+        sparkleMat.opacity = 0;
+
+        butterflies.forEach((b) => {
+          b.group.scale.set(0, 0, 0);
+        });
+
+        renderer.render(scene, camera);
+        return;
+      }
+
+      // --- ANIMATE SWARM BREAKING FROM PORTRAIT ON SCROLL ---
+      const swarmOpacity = Math.min(scrollProgress / 0.12, 1.0);
+      swarmMaterials.forEach((m) => {
+        m.opacity = swarmOpacity * 0.95;
       });
-      bodyMat.opacity = masterOpacity * 0.94;
+      bodyMat.opacity = swarmOpacity * 0.95;
+      sparkleMat.opacity = swarmOpacity * 0.85;
 
-      // Update swarm of butterflies
       butterflies.forEach((b, idx) => {
-        // Individual staggered progress
-        const rawP = Math.max(0, (scrollProgress - b.stagger) / (1.0 - b.stagger));
-        const p = Math.min(rawP, 1.0);
+        // Sync home position to anchor
+        b.homePos.set(
+          chestAnchor.x + b.offset.x,
+          chestAnchor.y + b.offset.y,
+          b.offset.z
+        );
 
-        // Smooth cubic ease-out trajectory
-        const easeP = 1 - Math.pow(1 - p, 2.8);
+        if (scrollProgress <= b.stagger) {
+          // Still waiting for the peel wave to reach this part
+          b.group.scale.set(0, 0, 0);
+          b.group.position.copy(b.homePos);
+        } else {
+          // Butterfly blooms and flies out from the dissolving silhouette!
+          const rawP = Math.min((scrollProgress - b.stagger) / (1.0 - b.stagger), 1.0);
+          const easeP = 1 - Math.pow(1 - rawP, 2.6);
 
-        // Soft harmonic swirling
-        const swirlAngle = time * b.swirlSpeed + b.swirlPhase;
-        const swirlX = Math.cos(swirlAngle) * b.swirlRadius * easeP;
-        const swirlY = Math.sin(swirlAngle * 1.2) * b.swirlRadius * easeP;
+          // Bloom scale from 0 to full size as it lifts off
+          const bloomScale = b.baseScale * Math.min(rawP * 3.5, 1.0) * (0.85 + easeP * 0.4);
+          b.group.scale.set(bloomScale, bloomScale, bloomScale);
 
-        // Position interpolation
-        const targetX = b.homePos.x + b.scatterDir.x * easeP * 1.85 + swirlX;
-        const targetY = b.homePos.y + b.scatterDir.y * easeP * 1.85 + swirlY;
-        const targetZ = b.homePos.z + b.scatterDir.z * easeP * 1.6;
+          // Harmonic swirling flight
+          const swirlAngle = time * b.swirlSpeed + b.swirlPhase;
+          const swirlX = Math.cos(swirlAngle) * b.swirlRadius * easeP;
+          const swirlY = Math.sin(swirlAngle * 1.2) * b.swirlRadius * easeP;
 
-        // Smooth position lerp
-        b.currentPos.lerp(new THREE.Vector3(targetX, targetY, targetZ), 0.09);
-        b.group.position.copy(b.currentPos);
+          const targetX = b.homePos.x + b.scatterDir.x * easeP * 1.8 + swirlX;
+          const targetY = b.homePos.y + b.scatterDir.y * easeP * 1.8 + swirlY;
+          const targetZ = b.homePos.z + b.scatterDir.z * easeP * 1.6;
 
-        // Natural wing flapping physics
-        // Dynamic rate increases with acceleration
-        const flapRate = b.flapSpeed * (1 + easeP * 1.1);
-        const flapCycle = Math.sin(time * flapRate + b.flapPhase);
-        // Realistic wing dihedral angle: downstroke is faster and wider
-        const wingAngle = (flapCycle * 0.65 + 0.25) * b.flapAmp;
+          b.currentPos.lerp(new THREE.Vector3(targetX, targetY, targetZ), 0.1);
+          b.group.position.copy(b.currentPos);
 
-        b.leftPivot.rotation.y = wingAngle;
-        b.rightPivot.rotation.y = -wingAngle;
+          // Wing flapping
+          const flapRate = b.flapSpeed * (1 + easeP * 1.2);
+          const flapCycle = Math.sin(time * flapRate + b.flapPhase);
+          const wingAngle = (flapCycle * 0.65 + 0.25) * b.flapAmp;
 
-        // Supple hindwing lag
-        b.leftHind.rotation.y = wingAngle * 0.85;
-        b.rightHind.rotation.y = -wingAngle * 0.85;
+          b.leftPivot.rotation.y = wingAngle;
+          b.rightPivot.rotation.y = -wingAngle;
+          b.leftHind.rotation.y = wingAngle * 0.85;
+          b.rightHind.rotation.y = -wingAngle * 0.85;
 
-        // Smooth rotational orientation (no abrupt snapping)
-        const flightDx = targetX - b.homePos.x;
-        const flightDy = targetY - b.homePos.y;
-        const targetRotY = Math.atan2(flightDx, targetZ - b.homePos.z) * 0.55;
-        const targetRotX = -flightDy * 0.18;
-        const targetRotZ = -flightDx * 0.3 + Math.sin(time * 2.5 + idx) * 0.08;
+          // Orientation
+          const flightDx = targetX - b.homePos.x;
+          const flightDy = targetY - b.homePos.y;
+          const targetRotY = Math.atan2(flightDx, targetZ - b.homePos.z) * 0.55;
+          const targetRotX = -flightDy * 0.16;
+          const targetRotZ = -flightDx * 0.28 + Math.sin(time * 2.5 + idx) * 0.08;
 
-        b.rotX += (targetRotX - b.rotX) * 0.08;
-        b.rotY += (targetRotY - b.rotY) * 0.08;
-        b.rotZ += (targetRotZ - b.rotZ) * 0.08;
+          b.rotX += (targetRotX - b.rotX) * 0.09;
+          b.rotY += (targetRotY - b.rotY) * 0.09;
+          b.rotZ += (targetRotZ - b.rotZ) * 0.09;
+          b.group.rotation.set(b.rotX, b.rotY, b.rotZ);
 
-        b.group.rotation.set(b.rotX, b.rotY, b.rotZ);
-
-        // Smooth scale modulation
-        const currentScale = b.baseScale * (0.85 + easeP * 0.3);
-        b.group.scale.set(currentScale, currentScale, currentScale);
-
-        // Emit delicate fairy dust sparkles
-        if (p > 0.06 && p < 0.96 && Math.random() < 0.15) {
-          const sIdx = sparkleCursor;
-          sparkleCursor = (sparkleCursor + 1) % SPARKLE_COUNT;
-          const pos = sparkleGeo.attributes.position;
-          pos.setXYZ(sIdx, b.currentPos.x, b.currentPos.y, b.currentPos.z);
-          sparkleLifes[sIdx] = 1.0;
-          sparkleVelocities[sIdx].set(
-            (Math.random() - 0.5) * 0.015,
-            -0.01 - Math.random() * 0.015,
-            (Math.random() - 0.5) * 0.015
-          );
+          // Spawn sparkles behind flying butterflies
+          if (rawP > 0.04 && rawP < 0.95 && Math.random() < 0.18) {
+            const sIdx = sparkleCursor;
+            sparkleCursor = (sparkleCursor + 1) % SPARKLE_COUNT;
+            const pos = sparkleGeo.attributes.position;
+            pos.setXYZ(sIdx, b.currentPos.x, b.currentPos.y, b.currentPos.z);
+            sparkleLifes[sIdx] = 1.0;
+            sparkleVelocities[sIdx].set(
+              (Math.random() - 0.5) * 0.02,
+              -0.01 - Math.random() * 0.02,
+              (Math.random() - 0.5) * 0.02
+            );
+          }
         }
       });
 
@@ -454,7 +481,7 @@ export default function HeroButterflyDisperse() {
       const posAttr = sparkleGeo.attributes.position;
       for (let i = 0; i < SPARKLE_COUNT; i++) {
         if (sparkleLifes[i] > 0) {
-          sparkleLifes[i] -= delta * 1.6;
+          sparkleLifes[i] -= delta * 1.5;
           posAttr.setXYZ(
             i,
             posAttr.getX(i) + sparkleVelocities[i].x,
@@ -466,7 +493,6 @@ export default function HeroButterflyDisperse() {
         }
       }
       posAttr.needsUpdate = true;
-      sparkleMat.opacity = masterOpacity * 0.85;
 
       renderer.render(scene, camera);
     };
@@ -481,6 +507,7 @@ export default function HeroButterflyDisperse() {
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
       renderer.setSize(width, height);
+      chestAnchor = getChestAnchor();
     };
 
     window.addEventListener("resize", handleResize);
@@ -504,7 +531,7 @@ export default function HeroButterflyDisperse() {
       sparkleGeo.dispose();
       sparkleMat.dispose();
       sparkleTexture.dispose();
-      materials.forEach((m) => {
+      swarmMaterials.forEach((m) => {
         if (m.map) m.map.dispose();
         m.dispose();
       });

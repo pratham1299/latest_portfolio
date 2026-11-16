@@ -184,7 +184,7 @@ export default function AboutIntro() {
           {FLOATING_BADGES.map((badge, i) => (
             <span
               key={badge.label}
-              className="animate-float-slow absolute hidden sm:flex items-center gap-2 pl-2 pr-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap"
+              className="animate-float-slow absolute hidden sm:flex items-center gap-2 pl-2 pr-3.5 py-2 rounded-full text-xs font-semibold whitespace-nowrap text-[#1b1a1a]"
               style={{
                 background: "#fff",
                 border: "1px solid rgba(27,26,26,0.1)",
@@ -254,7 +254,7 @@ export default function AboutIntro() {
               </StaggerItem>{" "}
               <StaggerItem as="span" y={16} className="inline-block">
                 who blends{" "}
-                <span className="font-semibold" style={{ color: "#5B4FCF" }}>
+                <span className="font-semibold brand-purple" style={{ color: "#5B4FCF" }}>
                   research, outreach, and performance marketing
                 </span>{" "}
                 into growth-focused campaigns.

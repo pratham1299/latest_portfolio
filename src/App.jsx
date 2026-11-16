@@ -5,6 +5,7 @@ import CustomCursor from "./components/CustomCursor";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Experience from "./pages/Experience";
+import HeroConcepts from "./pages/HeroConcepts";
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/experience" element={<Experience />} />
+          <Route path="/hero-concepts" element={<HeroConcepts />} />
+          <Route path="/hero-preview" element={<HeroConcepts />} />
         </Routes>
       </div>
     </BrowserRouter>

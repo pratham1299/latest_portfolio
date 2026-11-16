@@ -25,10 +25,9 @@ export default function Process() {
         {process.map((step, i) => (
           <StaggerItem key={step.title} className="relative">
             <span
-              className="relative z-10 flex items-center justify-center w-10 h-10 rounded-full mb-4 text-sm font-bold"
+              className="relative z-10 flex items-center justify-center w-10 h-10 rounded-full mb-4 text-sm font-bold text-[#1b1a1a] shadow-sm"
               style={{
                 background: STEP_COLORS[i % STEP_COLORS.length].bg,
-                color: STEP_COLORS[i % STEP_COLORS.length].ring,
                 border: `1.5px solid ${STEP_COLORS[i % STEP_COLORS.length].ring}`,
               }}
             >

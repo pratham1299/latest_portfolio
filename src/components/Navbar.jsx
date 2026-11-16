@@ -69,8 +69,8 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed w-full top-0 z-50 transition-all duration-500 ${
-        scrolled ? "py-3 bg-[var(--bg)]/85 backdrop-blur-md" : "py-5"
+      className={`fixed w-full top-0 z-50 transition-all duration-300 ${
+        scrolled ? "py-3 bg-[#f5f3ee]/90 backdrop-blur-md shadow-xs border-b border-black/5" : "py-4 sm:py-5 bg-transparent"
       }`}
     >
       {/* Spotlight scrim behind the open mega-menu */}
@@ -82,7 +82,7 @@ export default function Navbar() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             className="fixed inset-0 z-40 pointer-events-none"
-            style={{ background: "rgba(27,26,26,0.05)", backdropFilter: "blur(2px)" }}
+            style={{ background: "rgba(27,26,26,0.08)", backdropFilter: "blur(2px)" }}
           />
         )}
       </AnimatePresence>
@@ -91,7 +91,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center">
           <a
             href="/#home"
-            className="pill px-4 py-2 text-sm sm:text-base font-medium"
+            className="pill px-4 py-2 text-sm sm:text-base font-medium text-[#1b1a1a] shadow-2xs border border-black/10 hover:scale-[1.02] transition-transform"
             style={{ background: "var(--pill-yellow)" }}
           >
             {profile.name}
@@ -100,7 +100,7 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-3">
             <Link
               to="/about"
-              className="pill px-5 py-2 text-sm font-medium hover:opacity-70 transition-opacity"
+              className="pill px-5 py-2 text-sm font-medium text-[#1b1a1a] hover:opacity-75 transition-all shadow-2xs border border-black/10"
               style={{ background: isAbout ? "var(--pill-blue)" : "var(--pill-mint)" }}
             >
               About
@@ -109,7 +109,7 @@ export default function Navbar() {
             <div ref={menuRef} className="relative">
               <button
                 onClick={() => setWorksOpen((v) => !v)}
-                className="pill relative flex items-center gap-1.5 px-5 py-2 text-sm font-medium overflow-hidden"
+                className="pill relative flex items-center gap-1.5 px-5 py-2 text-sm font-medium text-[#1b1a1a] hover:text-black transition-all shadow-2xs border border-black/10 overflow-hidden"
                 style={{ background: "var(--pill-mint)" }}
               >
                 <motion.span
@@ -119,9 +119,9 @@ export default function Navbar() {
                   animate={{ opacity: worksOpen ? 0.6 : 0 }}
                   transition={{ duration: 0.3 }}
                 />
-                <span className="relative">Works</span>
+                <span className="relative transition-colors hover:text-black">Works</span>
                 <motion.svg
-                  className="relative w-3.5 h-3.5"
+                  className="relative w-3.5 h-3.5 transition-colors hover:text-black"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -141,11 +141,11 @@ export default function Navbar() {
                     exit={{ opacity: 0, y: 10, scale: 0.97 }}
                     transition={{ layout: { type: "spring", stiffness: 320, damping: 32 }, default: { type: "spring", stiffness: 340, damping: 28 } }}
                     className="absolute left-1/2 -translate-x-1/2 mt-4 max-w-[92vw] rounded-3xl overflow-hidden shadow-[0_30px_70px_-25px_rgba(27,26,26,0.35)]"
-                    style={{ background: "var(--surface)", border: "1px solid rgba(27,26,26,0.08)" }}
+                    style={{ background: "#f5f3ee", border: "1px solid rgba(27,26,26,0.12)" }}
                   >
                     <div className="flex relative">
                       {/* Category rail */}
-                      <div className="w-60 py-3 relative z-10 flex-shrink-0" style={{ borderRight: activeCat ? "1px dashed var(--divider)" : "none" }}>
+                      <div className="w-60 py-3 relative z-10 flex-shrink-0" style={{ borderRight: activeCat ? "1px dashed rgba(27,26,26,0.2)" : "none" }}>
                         {worksKeys.map((key) => {
                           const cat = works[key];
                           const colors = categoryColors[cat.color];
@@ -155,12 +155,14 @@ export default function Navbar() {
                               key={key}
                               onMouseEnter={() => setActiveCategory(key)}
                               onClick={() => setActiveCategory(key)}
-                              className="relative w-full flex items-center gap-3 px-4 py-2.5 text-left"
+                              className={`relative w-full flex items-center gap-3 px-4 py-2.5 text-left group transition-colors ${
+                                active ? "text-black font-semibold" : "text-[#1b1a1a] hover:text-black"
+                              }`}
                             >
                               {active && (
                                 <motion.div
                                   layoutId="works-active-pill"
-                                  className="absolute inset-y-0.5 inset-x-1.5 rounded-xl"
+                                  className="absolute inset-y-0.5 inset-x-1.5 rounded-xl border border-black/10"
                                   style={{ background: colors.soft }}
                                   transition={{ type: "spring", stiffness: 400, damping: 32 }}
                                 />
@@ -169,11 +171,19 @@ export default function Navbar() {
                                 className="relative w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform duration-300"
                                 style={{ background: colors.soft, transform: active ? "scale(1.08)" : "scale(1)" }}
                               >
-                                <svg className="w-3.5 h-3.5" fill="none" stroke="var(--ink)" strokeWidth={1.6} viewBox="0 0 24 24">
+                                <svg
+                                  className="w-3.5 h-3.5 transition-colors"
+                                  fill="none"
+                                  stroke="#1b1a1a"
+                                  strokeWidth={1.8}
+                                  viewBox="0 0 24 24"
+                                >
                                   <path strokeLinecap="round" strokeLinejoin="round" d={cat.icon} />
                                 </svg>
                               </span>
-                              <span className="relative text-sm font-medium leading-tight">{key}</span>
+                              <span className="relative text-sm font-medium leading-tight transition-colors group-hover:text-black">
+                                {key}
+                              </span>
                             </button>
                           );
                         })}
@@ -202,7 +212,7 @@ export default function Navbar() {
                               />
                               <div
                                 className="absolute inset-0 pointer-events-none opacity-[0.05]"
-                                style={{ backgroundImage: "radial-gradient(var(--ink) 1px, transparent 1.5px)", backgroundSize: "16px 16px" }}
+                                style={{ backgroundImage: "radial-gradient(#1b1a1a 1px, transparent 1.5px)", backgroundSize: "16px 16px" }}
                               />
 
                               <AnimatePresence mode="wait">
@@ -214,7 +224,7 @@ export default function Navbar() {
                                   variants={linkListVariants}
                                   className="relative z-10 space-y-1"
                                 >
-                                  <p className="text-xs font-semibold uppercase tracking-wide mb-2 px-1" style={{ color: "var(--ink-soft)" }}>
+                                  <p className="text-xs font-semibold uppercase tracking-wide mb-2 px-1 text-black/60">
                                     {activeCat.subcategories.length} case files
                                   </p>
                                   {activeCat.subcategories.map((sub) => (
@@ -226,11 +236,11 @@ export default function Navbar() {
                                       rel="noopener noreferrer"
                                       onClick={() => setWorksOpen(false)}
                                       whileHover={{ x: 4 }}
-                                      className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm hover:bg-black/[0.03] transition-colors"
+                                      className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm text-[#1b1a1a] hover:text-black hover:bg-black/[0.05] transition-colors group"
                                     >
-                                      <span>{sub.name}</span>
+                                      <span className="transition-colors group-hover:text-black">{sub.name}</span>
                                       <svg
-                                        className="w-3.5 h-3.5 flex-shrink-0 opacity-50"
+                                        className="w-3.5 h-3.5 flex-shrink-0 opacity-50 group-hover:opacity-100 group-hover:text-black transition-all"
                                         fill="none"
                                         stroke="currentColor"
                                         viewBox="0 0 24 24"
@@ -258,7 +268,7 @@ export default function Navbar() {
 
             <Link
               to="/experience"
-              className="pill px-5 py-2 text-sm font-medium hover:opacity-70 transition-opacity"
+              className="pill px-5 py-2 text-sm font-medium text-[#1b1a1a] hover:opacity-75 transition-all shadow-2xs border border-black/10"
               style={{ background: isExperience ? "var(--pill-blue)" : "var(--pill-mint)" }}
             >
               Experience
@@ -268,24 +278,31 @@ export default function Navbar() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={triggerResumeDownload}
-              className="pill px-5 py-2 text-sm font-medium hover:opacity-70 transition-opacity"
+              className="pill px-5 py-2 text-sm font-medium text-[#1b1a1a] hover:opacity-75 transition-all shadow-2xs border border-black/10"
               style={{ background: "var(--pill-mint)" }}
             >
               Resume
             </a>
+            <Link
+              to="/hero-concepts"
+              className="pill px-4 py-2 text-xs font-bold text-purple-900 bg-purple-100 hover:bg-purple-200 transition-all shadow-2xs border border-purple-300 flex items-center gap-1.5"
+            >
+              <span>✨</span>
+              <span>Hero Concepts</span>
+            </Link>
           </div>
 
           <MagneticButton
             as="button"
             onClick={() => setContactOpen(true)}
-            className="hidden lg:inline-flex pill px-5 py-2.5 text-sm font-semibold hover:opacity-80 transition-opacity"
+            className="hidden lg:inline-flex pill px-5 py-2.5 text-sm font-semibold text-[#1b1a1a] hover:opacity-85 transition-all shadow-2xs border border-black/10"
             style={{ background: "var(--pill-blue)" }}
           >
             Let&rsquo;s Connect
           </MagneticButton>
 
           <button
-            className="lg:hidden pill w-10 h-10 flex items-center justify-center"
+            className="lg:hidden pill w-10 h-10 flex items-center justify-center text-[#1b1a1a] shadow-2xs border border-black/10"
             style={{ background: "var(--pill-mint)" }}
             onClick={() => setMobileOpen((v) => !v)}
             aria-label="Toggle menu"
@@ -309,23 +326,23 @@ export default function Navbar() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden overflow-hidden relative z-50"
-            style={{ background: "var(--bg)" }}
+            className="lg:hidden overflow-hidden relative z-50 border-b border-black/10 shadow-lg"
+            style={{ background: "#f5f3ee" }}
           >
             <div className="container mx-auto px-4 pb-5 pt-2 flex flex-col gap-2 max-w-6xl max-h-[75vh] overflow-y-auto">
               <Link
                 to="/about"
                 onClick={() => setMobileOpen(false)}
-                className="pill w-full px-5 py-3 text-sm font-medium"
+                className="pill w-full px-5 py-3 text-sm font-medium text-[#1b1a1a] border border-black/10 shadow-2xs"
                 style={{ background: isAbout ? "var(--pill-blue)" : "var(--pill-mint)" }}
               >
                 About
               </Link>
 
-              <div className="rounded-3xl overflow-hidden" style={{ background: "var(--pill-mint)" }}>
+              <div className="rounded-3xl overflow-hidden text-[#1b1a1a] border border-black/10 shadow-2xs" style={{ background: "var(--pill-mint)" }}>
                 <button
                   onClick={() => setMobileCategory(mobileCategory === "__open" ? null : "__open")}
-                  className="w-full flex items-center justify-between px-5 py-3 text-sm font-medium"
+                  className="w-full flex items-center justify-between px-5 py-3 text-sm font-medium text-[#1b1a1a] hover:text-black transition-colors"
                 >
                   Works
                   <svg
@@ -351,20 +368,20 @@ export default function Navbar() {
                           const colors = categoryColors[cat.color];
                           const open = mobileCategory === key;
                           return (
-                            <div key={key} className="rounded-xl overflow-hidden" style={{ background: "var(--bg)" }}>
+                            <div key={key} className="rounded-xl overflow-hidden" style={{ background: "#eaeaea" }}>
                               <button
                                 onClick={() => setMobileCategory(open ? "__open" : key)}
-                                className="w-full flex items-center gap-3 py-2.5 px-3 text-sm font-medium"
+                                className="w-full flex items-center gap-3 py-2.5 px-3 text-sm font-medium text-[#1b1a1a] hover:text-black transition-colors group"
                               >
                                 <span
                                   className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
                                   style={{ background: colors.soft }}
                                 >
-                                  <svg className="w-3.5 h-3.5" fill="none" stroke="var(--ink)" strokeWidth={1.6} viewBox="0 0 24 24">
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="#1b1a1a" strokeWidth={1.6} viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" d={cat.icon} />
                                   </svg>
                                 </span>
-                                <span className="flex-1 text-left">{key}</span>
+                                <span className="flex-1 text-left transition-colors group-hover:text-black">{key}</span>
                                 <svg
                                   className={`w-3 h-3 transition-transform flex-shrink-0 ${open ? "rotate-90" : ""}`}
                                   fill="none"
@@ -383,8 +400,7 @@ export default function Navbar() {
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       onClick={() => setMobileOpen(false)}
-                                      className="block py-1.5 px-2 text-xs hover:opacity-60"
-                                      style={{ color: "var(--ink-soft)" }}
+                                      className="block py-1.5 px-2 text-xs text-[#1b1a1a]/75 hover:text-black transition-colors"
                                     >
                                       {sub.name}
                                     </a>
@@ -403,7 +419,7 @@ export default function Navbar() {
               <Link
                 to="/experience"
                 onClick={() => setMobileOpen(false)}
-                className="pill w-full px-5 py-3 text-sm font-medium"
+                className="pill w-full px-5 py-3 text-sm font-medium text-[#1b1a1a] border border-black/10 shadow-2xs"
                 style={{ background: isExperience ? "var(--pill-blue)" : "var(--pill-mint)" }}
               >
                 Experience
@@ -416,17 +432,24 @@ export default function Navbar() {
                   triggerResumeDownload();
                   setMobileOpen(false);
                 }}
-                className="pill w-full px-5 py-3 text-sm font-medium text-center"
+                className="pill w-full px-5 py-3 text-sm font-medium text-center text-[#1b1a1a] border border-black/10 shadow-2xs"
                 style={{ background: "var(--pill-mint)" }}
               >
                 Resume
               </a>
+              <Link
+                to="/hero-concepts"
+                onClick={() => setMobileOpen(false)}
+                className="pill w-full px-5 py-3 text-sm font-bold text-center text-purple-900 bg-purple-100 border border-purple-300 shadow-2xs flex items-center justify-center gap-1.5"
+              >
+                <span>✨ Preview Hero Concepts</span>
+              </Link>
               <button
                 onClick={() => {
                   setMobileOpen(false);
                   setContactOpen(true);
                 }}
-                className="pill w-full px-5 py-3 text-sm font-semibold"
+                className="pill w-full px-5 py-3 text-sm font-semibold text-[#1b1a1a] border border-black/10 shadow-2xs"
                 style={{ background: "var(--pill-blue)" }}
               >
                 Let&rsquo;s Connect

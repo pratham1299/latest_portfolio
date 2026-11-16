@@ -422,6 +422,64 @@ export const hobbies = [
   },
 ];
 
+// Real LinkedIn strategy & content highlights — her actual B2B campaigns at Track Opinion & Seventh Triangle.
+export const linkedin = {
+  name: "Priyanshi Gupta",
+  handle: "Priyanshi Gupta",
+  url: "https://www.linkedin.com/in/priyanshi-gupta-157006202",
+  badge: "Case Study — B2B LinkedIn & Content Strategy",
+  heading: "Organic B2B Reach & Employee Advocacy on LinkedIn",
+  subtext:
+    "Owning B2B content strategy end-to-end at Track Opinion — from pitching and launching an Employee Advocacy campaign to crafting research-backed carousels that turn industry data into high-engagement thought leadership.",
+  tactics: [
+    "Employee Advocacy",
+    "Carousel Storytelling",
+    "Thought Leadership",
+    "C-Suite Outreach",
+  ],
+  posts: [
+    {
+      id: "advocacy",
+      category: "Employee Advocacy",
+      headline: "Why corporate pages hit a ceiling — and how employee advocacy tripled our organic reach.",
+      tag: "#EmployeeAdvocacy",
+      slideCount: "6 slides",
+      accentBg: "#e0f2fe",
+      accentColor: "#0284c7",
+      reactions: "342",
+      comments: "48",
+      previewTitle: "Employee Advocacy Playbook",
+      previewSub: "Turning 50+ team members into organic brand champions",
+    },
+    {
+      id: "market-insights",
+      category: "Research Storytelling",
+      headline: "Raw survey data is silent until you give it a hook. Here's our 5-step data-to-content engine.",
+      tag: "#MarketResearch",
+      slideCount: "8 slides",
+      accentBg: "#fef3c7",
+      accentColor: "#b45309",
+      reactions: "518",
+      comments: "62",
+      previewTitle: "Data → Carousel Framework",
+      previewSub: "Visual storytelling for research & consumer analytics",
+    },
+    {
+      id: "outbound-cro",
+      category: "CRO & Outbound",
+      headline: "Auditing 45+ B2B funnels: the #1 messaging mistake that loses C-suite decision-makers.",
+      tag: "#B2BStrategy",
+      slideCount: "5 slides",
+      accentBg: "#dcfce7",
+      accentColor: "#15803d",
+      reactions: "425",
+      comments: "53",
+      previewTitle: "C-Suite Outreach Guide",
+      previewSub: "Aligning cold outreach with decision-maker intent",
+    },
+  ],
+};
+
 // Real Instagram content — the exact handle, view count, and reel links she provided.
 // Framed as a case study (personal channel used as a live testbed for SMM tactics),
 // not a social feed embed — keep copy in that register when editing.

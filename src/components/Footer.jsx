@@ -1,5 +1,6 @@
 import { footer, profile, instagram } from "../data/content";
 import { Reveal } from "./Reveal";
+import { PerchedBird } from "./LetsTalkBirds";
 
 // Drawn from her own established tagline ("Smart with research, sharp with
 // outreach...") rather than invented copy — just surfaced as a marquee.
@@ -50,21 +51,21 @@ function ChannelPill({ icon, label, value, href, external, styleSet }) {
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
-      className={`group flex items-center justify-between gap-4 rounded-full px-6 py-4 border border-[var(--divider)] transition-colors duration-300 ${styleSet.hover}`}
+      className={`group flex items-center justify-between gap-4 rounded-full px-6 py-4 border border-[var(--divider)] bg-[var(--surface)] backdrop-blur-md transition-all duration-300 ${styleSet.hover}`}
     >
       <span className="flex items-center gap-4 min-w-0">
-        <span className={`flex-shrink-0 ${styleSet.icon} transition-colors duration-300`}>{icon}</span>
+        <span className={`flex-shrink-0 ${styleSet.icon} group-hover:text-[#1b1a1a] transition-colors duration-300`}>{icon}</span>
         <span className="min-w-0">
-          <span className="block text-[10px] uppercase tracking-[0.2em]" style={{ color: "var(--ink-soft)" }}>
+          <span className="block text-[10px] uppercase tracking-[0.2em] group-hover:text-[#1b1a1a]/70" style={{ color: "var(--ink-soft)" }}>
             {label}
           </span>
-          <span className="block text-base sm:text-lg truncate" style={{ color: "var(--ink)" }}>
+          <span className="block text-base sm:text-lg truncate group-hover:text-[#1b1a1a]" style={{ color: "var(--ink)" }}>
             {value}
           </span>
         </span>
       </span>
       <svg
-        className="w-5 h-5 flex-shrink-0 group-hover:rotate-45 transition-transform duration-300"
+        className="w-5 h-5 flex-shrink-0 group-hover:rotate-45 group-hover:stroke-[#1b1a1a] transition-transform duration-300"
         fill="none"
         stroke="var(--ink)"
         strokeWidth={2}
@@ -87,7 +88,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer id="contact" className="relative overflow-hidden" style={{ background: "var(--surface)" }}>
+    <footer id="contact" className="relative overflow-hidden bg-transparent">
       {/* scrolling marquee, built from her own existing tagline */}
       <div
         className="overflow-hidden py-4"
@@ -117,20 +118,47 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 lg:pt-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-end mb-16 lg:mb-20">
           <Reveal blur className="lg:col-span-7">
-            <h2
-              className="uppercase leading-[0.82]"
-              style={{
-                fontSize: "clamp(3.5rem, 13.5vw, 8.5rem)",
-                color: "var(--ink)",
-                fontWeight: 700,
-                fontFamily: "'Oswald', sans-serif",
-                letterSpacing: "-0.025em",
-              }}
-            >
-              Let&rsquo;s
-              <br />
-              <span style={{ color: "#B08968" }}>Talk</span>
-            </h2>
+            <div className="relative inline-block">
+              <h2
+                className="uppercase leading-[0.82] relative"
+                style={{
+                  fontSize: "clamp(3.5rem, 13.5vw, 8.5rem)",
+                  color: "var(--ink)",
+                  fontWeight: 700,
+                  fontFamily: "'Oswald', sans-serif",
+                  letterSpacing: "-0.025em",
+                }}
+              >
+                <span className="relative inline-block">
+                  Let&rsquo;
+                  <span className="relative inline-block">
+                    s
+                    {/* Bird 2 with party cone hat perched directly on the letter 'S' */}
+                    <span className="absolute bottom-[80%] sm:bottom-[82%] left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
+                      <PerchedBird
+                        type="party"
+                        scale={0.92}
+                        flip={true}
+                      />
+                    </span>
+                  </span>
+                </span>
+                <br />
+                <span className="relative inline-block" style={{ color: "#B08968" }}>
+                  <span className="relative inline-block">
+                    T
+                    {/* Bird 1 with sunglasses perched directly on the letter 'T' */}
+                    <span className="absolute bottom-[80%] sm:bottom-[82%] left-1/2 -translate-x-1/2 z-30 pointer-events-auto">
+                      <PerchedBird
+                        type="sunglasses"
+                        scale={0.96}
+                      />
+                    </span>
+                  </span>
+                  alk
+                </span>
+              </h2>
+            </div>
             <p className="italic mt-6 max-w-md text-lg sm:text-xl" style={{ color: "var(--ink-soft)" }}>
               {footer.tagline}
             </p>
