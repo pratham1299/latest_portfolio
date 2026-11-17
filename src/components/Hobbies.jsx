@@ -10,10 +10,58 @@ function LinkedInGlyph({ color = "#fff" }) {
   );
 }
 
+// LinkedIn's embed has no resizable-widget script (unlike Instagram's), so we
+// render the real post at native size inside a tall fixed iframe, then crop
+// a small window positioned over the post's own attached photo/video — a
+// genuine thumbnail of what she actually posted, not a redrawn preview.
+const LI_BASE_WIDTH = 338;
+const LI_TALL_HEIGHT = 1800;
+const LI_WINDOW_HEIGHT = 140;
+const LI_SCALE = 0.45;
+
+function LinkedInThumb({ src, cropTop = 0 }) {
+  if (!src) return null;
+  return (
+    <div
+      className="relative overflow-hidden rounded-lg"
+      style={{
+        width: LI_BASE_WIDTH * LI_SCALE,
+        height: LI_WINDOW_HEIGHT * LI_SCALE,
+        WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%)",
+        maskImage: "linear-gradient(to bottom, transparent 0%, black 22%, black 78%, transparent 100%)",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: -cropTop * LI_SCALE,
+          left: 0,
+          width: LI_BASE_WIDTH,
+          height: LI_TALL_HEIGHT,
+          transform: `scale(${LI_SCALE})`,
+          transformOrigin: "top left",
+          pointerEvents: "none",
+        }}
+      >
+        <iframe
+          src={src}
+          width={LI_BASE_WIDTH}
+          height={LI_TALL_HEIGHT}
+          frameBorder="0"
+          loading="lazy"
+          tabIndex={-1}
+          title="LinkedIn post thumbnail"
+          style={{ border: 0, display: "block" }}
+        />
+      </div>
+    </div>
+  );
+}
+
 function LinkedInPostCard({ post, profileUrl }) {
   return (
     <a
-      href={profileUrl}
+      href={post.url || profileUrl}
       target="_blank"
       rel="noreferrer"
       className="group block relative rounded-[1.25rem] bg-white p-3 text-[#1b1a1a] transition-all duration-300 hover:-translate-y-1 hover:shadow-xl flex flex-col justify-between h-full"
@@ -58,34 +106,26 @@ function LinkedInPostCard({ post, profileUrl }) {
           {post.headline}
         </p>
 
-        {/* Carousel / Deck Preview Slide */}
+        {/* Real Attached Photo/Video — a cropped, scaled-down live embed of her actual post */}
         <div
-          className="rounded-lg p-2.5 mb-2 relative overflow-hidden transition-transform duration-300 group-hover:scale-[1.02]"
+          className="rounded-lg p-1.5 mb-2 relative overflow-hidden transition-transform duration-300 group-hover:scale-[1.02] flex flex-col items-center gap-1"
           style={{
             background: post.accentBg,
             border: `1px solid ${post.accentColor}33`,
           }}
         >
-          <div className="flex items-center justify-between mb-1.5">
+          <div className="flex items-center justify-between w-full px-0.5">
             <span
               className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm"
               style={{ background: "#ffffff", color: post.accentColor }}
             >
-              Deck
+              {post.format || "Post"}
             </span>
             <span className="text-[9px] font-medium text-slate-600">
               {post.slideCount}
             </span>
           </div>
-          <h4
-            className="text-[11px] font-bold leading-tight mb-0.5"
-            style={{ color: post.accentColor }}
-          >
-            {post.previewTitle}
-          </h4>
-          <p className="text-[9.5px] text-slate-600 line-clamp-2 leading-tight">
-            {post.previewSub}
-          </p>
+          <LinkedInThumb src={post.embedSrc} cropTop={post.embedCropTop} />
         </div>
       </div>
 
