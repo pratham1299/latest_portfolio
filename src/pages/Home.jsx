@@ -5,6 +5,7 @@ import Portfolio from "../components/Portfolio";
 import CaseStudies from "../components/CaseStudies";
 import Process from "../components/Process";
 import Hobbies from "../components/Hobbies";
+import ComplimentsWall from "../components/ComplimentsWall";
 import Footer from "../components/Footer";
 import GlobalSkyScene from "../components/GlobalSkyScene";
 
@@ -50,6 +51,9 @@ export default function Home() {
         </section>
         <Process />
         <Hobbies />
+        <section className="py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
+          <ComplimentsWall />
+        </section>
         <Footer />
       </div>
     </div>
